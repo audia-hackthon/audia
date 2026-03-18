@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Audia — Microphone Setup</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+    body {
+      background: #0a0a0c;
+      color: #e8e8ec;
+      font-family: 'DM Mono', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .card {
+      background: #111116;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 420px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(0, 229, 200, 0.12);
+      border: 2px solid #00e5c8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 24px;
+      box-shadow: 0 0 24px rgba(0, 229, 200, 0.3);
+    }
+    .icon svg {
+      width: 36px;
+      height: 36px;
+      stroke: #00e5c8;
+      fill: none;
+      stroke-width: 1.5;
+    }
+    h1 { margin: 0 0 12px; font-size: 24px; font-weight: 500; }
+    p { margin: 0 0 24px; color: #6b6b7a; line-height: 1.6; font-size: 14px; }
+    button {
+      background: #00e5c8;
+      color: #000;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 20px rgba(0, 229, 200, 0.3);
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 32px rgba(0, 229, 200, 0.4);
+    }
+    .success { display: none; margin-top: 20px; color: #00e5c8; font-weight: 500; }
+    .error { display: none; margin-top: 20px; color: #ff4a4a; font-weight: 500; font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 24 24">
+        <rect x="9" y="2" width="6" height="12" rx="3"/>
+        <path d="M5 10a7 7 0 0 0 14 0"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+        <line x1="8" y1="22" x2="16" y2="22"/>
+      </svg>
+    </div>
+    <h1>Enable Microphone</h1>
+    <p>Audia needs microphone access to listen to your voice commands. Please click the button below and safely click <strong>Allow</strong> in the prompt.</p>
+    <button id="req-btn">🎤 Grant Permission</button>
+    <div id="success-msg" class="success">✅ Permission granted! You can close this tab and use Audia.</div>
+    <div id="error-msg" class="error">❌ Permission denied. Please click the icon in the address bar and allow the microphone.</div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

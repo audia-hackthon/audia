@@ -1,0 +1,100 @@
+/* Injection Container Styles */
+#voivr-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#voivr-transcript {
+  margin-bottom: 16px;
+  min-width: 250px;
+  max-width: 320px;
+  padding: 16px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#voivr-transcript.voivr-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+.voivr-status {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #3b82f6;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}
+
+.voivr-text {
+  font-size: 14px;
+  color: #18181b;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Microphone Button */
+#voivr-mic-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  outline: none;
+}
+
+#voivr-mic-btn:hover {
+  transform: scale(1.05);
+}
+
+#voivr-mic-btn:active {
+  transform: scale(0.95);
+}
+
+.voivr-inactive {
+  background-color: #27272a;
+  color: white;
+}
+
+.voivr-active {
+  background-color: #2563eb;
+  color: white;
+  animation: voivr-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.voivr-processing {
+  background-color: #9333ea;
+  color: white;
+  animation: voivr-spin 2s linear infinite;
+}
+
+@keyframes voivr-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  50% { opacity: 0.9; box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+}
+
+@keyframes voivr-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

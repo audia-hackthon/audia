@@ -1,0 +1,453 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+/* ─── Reset & Base ─────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #0a0a0c;
+  --surface:     #111116;
+  --surface2:    #18181f;
+  --accent:      #00e5c8;
+  --accent-dim:  rgba(0, 229, 200, 0.12);
+  --accent-glow: rgba(0, 229, 200, 0.30);
+  --text:        #e8e8ec;
+  --muted:       #6b6b7a;
+  --user-bubble: #1a1a22;
+  --ai-bubble:   #0d1f1d;
+  --border:      rgba(255,255,255,0.06);
+  --radius:      14px;
+}
+
+html, body {
+  width: 400px;
+  height: 580px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ─── Layout ───────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 580px;
+  background: var(--bg);
+  position: relative;
+}
+
+/* ─── Header ───────────────────────────────────────────── */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 56px;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 var(--accent-glow); }
+  50%       { opacity: 0.7; transform: scale(1.15); box-shadow: 0 0 0 4px transparent; }
+}
+
+#brand {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+#page-domain {
+  font-size: 11px;
+  color: var(--muted);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Conversation Log ──────────────────────────────────── */
+#conversation-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+
+#conversation-log::-webkit-scrollbar {
+  width: 4px;
+}
+#conversation-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+#conversation-log::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* ─── Empty State ───────────────────────────────────────── */
+#empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px;
+}
+
+#empty-state .empty-icon {
+  font-size: 28px;
+  opacity: 0.4;
+}
+
+#empty-state p {
+  opacity: 0.6;
+  line-height: 1.6;
+}
+
+/* ─── Chat Bubbles ─────────────────────────────────────── */
+.bubble-row {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+  gap: 3px;
+  animation: bubbleIn 0.25s ease;
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bubble-row.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.bubble-row.ai {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.bubble {
+  padding: 9px 13px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  word-break: break-word;
+  position: relative;
+}
+
+.bubble-row.user .bubble {
+  background: var(--user-bubble);
+  border-radius: 12px 12px 2px 12px;
+  color: var(--text);
+}
+
+.bubble-row.ai .bubble {
+  background: var(--ai-bubble);
+  border-left: 2px solid var(--accent);
+  border-radius: 12px 12px 12px 2px;
+  color: var(--text);
+}
+
+.bubble-time {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+/* ─── Mic Area ──────────────────────────────────────────── */
+#mic-area {
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-top: 0.5px solid var(--border);
+  background: var(--surface);
+  position: relative;
+}
+
+/* Mic Button */
+#mic-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+#mic-btn:hover {
+  transform: scale(1.05);
+  background: var(--accent-dim);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+#mic-btn:active {
+  transform: scale(0.97);
+}
+
+#mic-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--accent);
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ─── State: LISTENING — Pulse Rings ─────────────────────── */
+#mic-btn.state-listening {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+#mic-btn.state-listening::before,
+#mic-btn.state-listening::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  animation: pulse-ring 1.4s ease-out infinite;
+  pointer-events: none;
+}
+
+#mic-btn.state-listening::after {
+  inset: -18px;
+  animation-delay: 0.5s;
+}
+
+@keyframes pulse-ring {
+  0%   { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+/* ─── State: PROCESSING — Spinning Arc ───────────────────── */
+#mic-btn.state-processing {
+  border-color: transparent;
+  background: var(--accent-dim);
+  animation: spin-glow 1s linear infinite;
+}
+
+@keyframes spin-glow {
+  from { box-shadow: 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow); }
+  to   { transform: rotate(360deg); box-shadow: 0 0 0 2px var(--accent), 0 0 18px var(--accent-glow); }
+}
+
+/* ─── Waveform Bars (Speaking) ───────────────────────────── */
+#waveform {
+  display: none;
+  gap: 3px;
+  align-items: center;
+  height: 24px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+#mic-btn.state-speaking #waveform {
+  display: flex;
+}
+#mic-btn.state-speaking #mic-icon {
+  display: none;
+}
+
+.wv-bar {
+  width: 3px;
+  background: var(--accent);
+  border-radius: 3px;
+  animation: waveBar 0.7s ease-in-out infinite alternate;
+}
+.wv-bar:nth-child(1) { animation-delay: 0.0s; animation-duration: 0.65s; }
+.wv-bar:nth-child(2) { animation-delay: 0.1s; animation-duration: 0.55s; }
+.wv-bar:nth-child(3) { animation-delay: 0.05s; animation-duration: 0.75s; }
+.wv-bar:nth-child(4) { animation-delay: 0.15s; animation-duration: 0.60s; }
+.wv-bar:nth-child(5) { animation-delay: 0.08s; animation-duration: 0.70s; }
+
+@keyframes waveBar {
+  from { height: 4px; opacity: 0.4; }
+  to   { height: 20px; opacity: 1; }
+}
+
+/* ─── Status Text ───────────────────────────────────────── */
+#status-text {
+  font-size: 11.5px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-align: center;
+  min-height: 16px;
+  transition: color 0.2s ease;
+}
+
+#status-text.active {
+  color: var(--accent);
+}
+
+/* ─── Keyboard Hint ─────────────────────────────────────── */
+#keyboard-hint {
+  font-size: 10.5px;
+  color: var(--muted);
+  opacity: 0.45;
+  letter-spacing: 0.05em;
+  text-align: center;
+  padding: 6px 0 8px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: inherit;
+}
+
+/* ─── Permission Onboarding Screen ──────────────────────── */
+#permission-screen {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+#permission-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  max-width: 320px;
+}
+
+#perm-mic-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-dim);
+  animation: permPulse 2.5s ease-in-out infinite;
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+#perm-mic-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--accent);
+}
+
+@keyframes permPulse {
+  0%, 100% { box-shadow: 0 0 16px var(--accent-glow); }
+  50%       { box-shadow: 0 0 36px var(--accent-glow), 0 0 60px rgba(0,229,200,0.12); }
+}
+
+#perm-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+#perm-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 260px;
+}
+
+#allow-mic-btn {
+  margin-top: 4px;
+  padding: 13px 28px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 50px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+#allow-mic-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 32px var(--accent-glow);
+}
+
+#allow-mic-btn:active {
+  transform: scale(0.97);
+}
+
+#perm-note {
+  font-size: 10.5px;
+  color: var(--muted);
+  opacity: 0.6;
+  line-height: 1.6;
+}
+
+#perm-note strong {
+  color: var(--accent);
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audia</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Header ── -->
+    <header id="header">
+      <div class="header-left">
+        <div id="pulse-dot"></div>
+        <span id="brand">Audia</span>
+      </div>
+      <span id="page-domain">—</span>
+    </header>
+
+    <!-- ── Conversation Log ── -->
+    <div id="conversation-log">
+      <div id="empty-state">
+        <span class="empty-icon">🎙️</span>
+        <p>Ask me anything about this page</p>
+      </div>
+    </div>
+
+    <!-- ── Mic Area ── -->
+    <div id="mic-area">
+      <button id="mic-btn" aria-label="Toggle microphone" title="Toggle mic (Space)">
+        <!-- Mic SVG Icon -->
+        <svg id="mic-icon" viewBox="0 0 24 24">
+          <rect x="9" y="2" width="6" height="12" rx="3"/>
+          <path d="M5 10a7 7 0 0 0 14 0"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+        </svg>
+        <!-- Waveform bars for speaking state -->
+        <div id="waveform">
+          <div class="wv-bar"></div>
+          <div class="wv-bar"></div>
+          <div class="wv-bar"></div>
+          <div class="wv-bar"></div>
+          <div class="wv-bar"></div>
+        </div>
+      </button>
+      <div id="status-text">Tap to speak</div>
+    </div>
+
+    <!-- ── Keyboard Hint ── -->
+    <div id="keyboard-hint">
+      <kbd>Space</kbd> to toggle mic
+    </div>
+
+    <!-- ── Mic Permission Onboarding Screen ── -->
+    <!-- Shown on first open; hidden once mic is granted -->
+    <div id="permission-screen" style="display:none;">
+      <div id="permission-card">
+        <div id="perm-mic-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="9" y="2" width="6" height="12" rx="3"/>
+            <path d="M5 10a7 7 0 0 0 14 0"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="8" y1="22" x2="16" y2="22"/>
+          </svg>
+        </div>
+        <h2 id="perm-title">Enable Voice</h2>
+        <p id="perm-desc">Audia needs microphone access to hear your commands. Click below to allow it once.</p>
+        <button id="allow-mic-btn">🎤 Allow Microphone</button>
+        <p id="perm-note">You'll see a Chrome dialog — click <strong>Allow</strong></p>
+      </div>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
