@@ -81,6 +81,18 @@
     <button id="req-btn">🎤 Grant Permission</button>
     <div id="success-msg" class="success">✅ Permission granted! You can close this tab and use Audia.</div>
     <div id="error-msg" class="error">❌ Permission denied. Please click the icon in the address bar and allow the microphone.</div>
+
+    <hr style="border:none; border-top:1px solid rgba(255,255,255,0.06); margin: 30px 0;">
+    <h1>API Configuration</h1>
+    <p>Securely store your API keys locally. They never leave your device except to query the models.</p>
+    <div style="text-align: left; margin-bottom: 16px;">
+      <label style="font-size: 12px; color: #6b6b7a; margin-bottom: 4px; display: block;">Groq API Key</label>
+      <input type="password" id="groq-key" placeholder="gsk_..." style="width:100%; box-sizing:border-box; padding: 12px; margin-bottom: 12px; background: #1a1a24; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; font-family: inherit;">
+      <label style="font-size: 12px; color: #6b6b7a; margin-bottom: 4px; display: block;">Murf AI Key</label>
+      <input type="password" id="murf-key" placeholder="ap2_..." style="width:100%; box-sizing:border-box; padding: 12px; margin-bottom: 16px; background: #1a1a24; border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; font-family: inherit;">
+    </div>
+    <button id="save-keys-btn">💾 Save Keys</button>
+    <div id="keys-success" class="success">✅ Keys saved securely!</div>
   </div>
   <script src="options.js"></script>
 </body>

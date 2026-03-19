@@ -10,6 +10,22 @@ const emptyState      = document.getElementById("empty-state");
 const pageDomain      = document.getElementById("page-domain");
 const permScreen      = document.getElementById("permission-screen");
 const allowMicBtn     = document.getElementById("allow-mic-btn");
+const langSelect      = document.getElementById("lang-select");
+
+// ─── Language Preference ─────────────────────────────────
+let currentLang = "en-US";
+chrome.storage.local.get("audia_lang", (data) => {
+  if (data.audia_lang) {
+    currentLang = data.audia_lang;
+    if (langSelect) langSelect.value = currentLang;
+  }
+});
+if (langSelect) {
+  langSelect.addEventListener("change", (e) => {
+    currentLang = e.target.value;
+    chrome.storage.local.set({ audia_lang: currentLang });
+  });
+}
 
 // ─── Permission Screen Logic ──────────────────────────────
 // On popup open: check if mic is already granted.
@@ -187,7 +203,7 @@ function startPopupSpeechRecognition() {
   const recognition = new SR();
   recognition.continuous = false;
   recognition.interimResults = false;
-  recognition.lang = "en-US";
+  recognition.lang = currentLang;
   recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
@@ -349,7 +365,7 @@ async function processCommand(transcript) {
   try {
     const bgResponse = await chrome.runtime.sendMessage({
       action: "process_command",
-      payload: { transcript, pageTitle, pageUrl, domSnapshot }
+      payload: { transcript, pageTitle, pageUrl, domSnapshot, lang: currentLang }
     });
     groqResult = bgResponse?.groqResult;
     audioData = bgResponse?.audioData;

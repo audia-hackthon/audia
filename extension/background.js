@@ -3,8 +3,13 @@
 // Replace the placeholder strings below with your real keys.
 // ============================================================
 
-const GROQ_API_KEY = "YOUR_GROQ_API_KEY";
-const MURF_API_KEY = "YOUR_MURF_API_KEY";
+async function getDynamicKeys() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(["audia_groq_key", "audia_murf_key"], (data) => {
+      resolve({ groq: data.audia_groq_key || "", murf: data.audia_murf_key || "" });
+    });
+  });
+}
 
 const SYSTEM_PROMPT = `You are Audia, a universal voice browser copilot. You work on ANY website — e-commerce, news, Wikipedia, social media, documentation, SaaS apps, and more. You receive:
 1. The user's voice intent
@@ -32,7 +37,8 @@ You MUST respond ONLY in this exact JSON format — no preamble, no markdown:
 
 | type             | When to use                                              | target              | value         |
 |------------------|----------------------------------------------------------|---------------------|---------------|
-| navigate_to      | "go to X", "open X page", "take me to X"                | link text           | null          |
+| goto_url         | open a known website directly (e.g. YouTube, Google)     | full https URL      | null          |
+| navigate_to      | "go to X", "open X page" (using links on CURRENT page)   | link text           | null          |
 | click_element    | click a button for an in-page action                     | button text         | null          |
 | type_and_search  | "search for X", "find X", "look up X"                   | search field label  | the search term|
 | fill_field       | fill a form field (name, email, address, etc.)           | field label         | text to type  |
@@ -47,6 +53,7 @@ You MUST respond ONLY in this exact JSON format — no preamble, no markdown:
 
 ━━━ UNIVERSAL INTENT MAPPING ━━━
 
+"Open YouTube / Facebook" → goto_url, target = "https://www.youtube.com"
 "Go to cart / orders / my account / checkout" → navigate_to, target = link text from NAV/LINK items
 "Search for iPhones / laptops / anything" → type_and_search, target = SEARCH_INPUT label, value = search term
 "Show me [product]" → type_and_search if search box exists, else navigate_to or scroll_to_text
@@ -69,7 +76,7 @@ You MUST respond ONLY in this exact JSON format — no preamble, no markdown:
 - response_text is ALWAYS filled — the user hears this via Murf voice`;
 
 // ─── Groq API ───────────────────────────────────────────────
-async function callGroq(transcript, pageTitle, pageUrl, domSnapshot) {
+async function callGroq(transcript, pageTitle, pageUrl, domSnapshot, lang) {
   // Aggressively prevent token rate-limit errors (Groq free tier has 100k TPD).
   // 6000 chars is ~1500 tokens, preventing the limit from acting up too fast.
   const MAX_DOM_LENGTH = 6000;
@@ -77,14 +84,19 @@ async function callGroq(transcript, pageTitle, pageUrl, domSnapshot) {
     ? domSnapshot.substring(0, MAX_DOM_LENGTH) + "\n...[TRUNCATED_FOR_LENGTH]" 
     : domSnapshot;
 
-  const userMessage = `User said: "${transcript}"\n\nCurrent page: ${pageTitle} (${pageUrl})\n\nDOM Snapshot:\n${safeSnapshot}`;
+  const userMessage = `User language: ${lang || 'en-US'}\nUser said: "${transcript}"\n\nCurrent page: ${pageTitle} (${pageUrl})\n\nDOM Snapshot:\n${safeSnapshot}\n\nIMPORTANT: Put "response_text" and "answer" in the user's spoken language, but keep JSON keys and interaction targets in the native DOM's original language.`;
+
+  const keys = await getDynamicKeys();
+  if (!keys.groq) {
+    return { actions: [{ type: "none" }], response_text: "API Key logic missing. Please open the Audia extension options to save your Groq key.", answer: null, confidence: "low" };
+  }
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`
+        "Authorization": `Bearer ${keys.groq}`
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
@@ -148,16 +160,32 @@ async function callGroq(transcript, pageTitle, pageUrl, domSnapshot) {
 }
 
 // ─── Murf API ───────────────────────────────────────────────
-async function callMurf(text) {
+async function callMurf(text, lang) {
+  const langVoices = {
+    "en-US": "en-US-natalie",
+    "es-ES": "es-ES-antonio",
+    "fr-FR": "fr-FR-blaise",
+    "de-DE": "de-DE-leo",
+    "hi-IN": "hi-IN-amit",
+    "zh-CN": "zh-CN-zhao",
+    "ja-JP": "ja-JP-takeru",
+    "ar-SA": "ar-SA-omar",
+    "ru-RU": "ru-RU-boris"
+  };
+  const voiceId = langVoices[lang] || "en-US-natalie";
+
+  const keys = await getDynamicKeys();
+  if (!keys.murf) return { audioData: null };
+
   try {
     const response = await fetch("https://api.murf.ai/v1/speech/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "api-key": MURF_API_KEY
+        "api-key": keys.murf
       },
       body: JSON.stringify({
-        voiceId: "en-US-natalie",
+        voiceId: voiceId,
         text: text,
         format: "MP3",
         sampleRate: 24000,
@@ -226,8 +254,8 @@ function quickIntentCheck(transcript) {
   const lower = transcript.toLowerCase().trim();
 
   const navPatterns = [
-    /^(?:open|go to|take me to|navigate to|launch|visit|load|show me)\s+(.+)$/,
-    /^(.+?)(?:\s+website|\s+site|\s+page)?\s+(?:open|please open|open please)$/,
+    /^(?:open|abre|abrir|ouvre|go to|ve a|ir a|take me to|navigate to|launch|visit|load|show me)\s+(.+)$/,
+    /^(.+?)(?:\s+website|\s+site|\s+page)?\s+(?:open|abre|please open|open please)$/,
   ];
 
   for (const pattern of navPatterns) {
@@ -257,13 +285,13 @@ function quickIntentCheck(transcript) {
 // ─── Message Router ─────────────────────────────────────────
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "process_command") {
-    const { transcript, pageTitle, pageUrl, domSnapshot } = request.payload;
+    const { transcript, pageTitle, pageUrl, domSnapshot, lang } = request.payload;
 
     (async () => {
       // ── 1. Quick-resolve common navigation commands (no Groq needed) ──
       const quickResult = quickIntentCheck(transcript);
       if (quickResult) {
-        const murfResult = await callMurf(quickResult.response_text);
+        const murfResult = await callMurf(quickResult.response_text, lang);
         sendResponse({ groqResult: quickResult, audioData: murfResult.audioData });
         return;
       }
@@ -274,8 +302,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         : `TITLE: ${pageTitle}\nURL: ${pageUrl}`;
 
       // ── 3. Full Groq pipeline ──
-      const groqResult = await callGroq(transcript, pageTitle, pageUrl, snapshotToSend);
-      const murfResult = await callMurf(groqResult.response_text);
+      const groqResult = await callGroq(transcript, pageTitle, pageUrl, snapshotToSend, lang);
+      const murfResult = await callMurf(groqResult.response_text, lang);
       sendResponse({ groqResult, audioData: murfResult.audioData });
     })();
 

@@ -15,6 +15,12 @@
   // ════════════════════════════════════════════════════════
 
   let recognition = null;
+  let currentLang = "en-US";
+  try {
+    chrome.storage.local.get("audia_lang", (data) => {
+      if (data && data.audia_lang) currentLang = data.audia_lang;
+    });
+  } catch (e) {}
 
   function initRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -22,7 +28,7 @@
     const r = new SR();
     r.continuous = false;
     r.interimResults = false;
-    r.lang = "en-US";
+    r.lang = currentLang;
     r.onresult = (event) => {
       const transcript = event.results[0][0].transcript.trim();
       chrome.runtime.sendMessage({ action: "transcript_result", transcript });
