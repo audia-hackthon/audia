@@ -6,7 +6,10 @@
 async function getDynamicKeys() {
   return new Promise((resolve) => {
     chrome.storage.local.get(["audia_groq_key", "audia_murf_key"], (data) => {
-      resolve({ groq: data.audia_groq_key || "", murf: data.audia_murf_key || "" });
+      resolve({ 
+        groq: data.audia_groq_key || "", 
+        murf: data.audia_murf_key || "" 
+      });
     });
   });
 }
