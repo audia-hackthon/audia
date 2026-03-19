@@ -387,10 +387,15 @@ async function processCommand(transcript) {
     const validActions = groqResult.actions.filter((a) => a.type !== "none");
 
     // ── goto_url: execute directly via chrome.tabs.update ───────────────────
-    // This works on ANY tab including chrome:// NTP pages — no content script needed.
     for (const act of validActions) {
       if (act.type === "goto_url" && act.target) {
-        chrome.tabs.update(activeTabId, { url: act.target });
+        chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+          if (tabs && tabs[0]) {
+            chrome.tabs.update(tabs[0].id, { url: act.target });
+          } else if (activeTabId) {
+            chrome.tabs.update(activeTabId, { url: act.target });
+          }
+        });
       }
     }
 
