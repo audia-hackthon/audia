@@ -76,6 +76,7 @@ You MUST respond ONLY in this exact JSON format — no preamble, no markdown:
 - Use text exactly as it appears in the DOM snapshot (NAV:, BUTTON:, LINK:, ITEM:, SEARCH_INPUT:, SELECT:)
 - For SEARCH_INPUT items use the label shown (e.g. "Search Amazon.in") as target
 - For navigate_to: use the text from NAV: or LINK: entries
+- E-COMMERCE RULE: If a user specifies an item (e.g. "Add the red helmet to cart"), ALWAYS click the EXACT PRODUCT NAME from the ITEM: list to open its page first. NEVER target generic "Add to cart" buttons from a search page, as it will click the wrong product.
 - Never use CSS class names, IDs, or XPath — just the visible text
 - If multiple elements match, prefer buttons inside main content (not header/footer)
 - actions is an ARRAY — chain multiple steps when needed
