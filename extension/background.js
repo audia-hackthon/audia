@@ -10,7 +10,7 @@ async function getDynamicKeys() {
     
     chrome.storage.local.get(["audia_groq_key", "audia_murf_key"], (data) => {
       resolve({ 
-        groq: data.audia_groq_key || safeJoin(["gsk", "_", "ZrRt", "GfBbbC", "G71JL", "RQuA6W", "Gdyb3F", "YmcieU", "A872iZ", "qej9ft", "kFcpDxK"]), 
+        groq: data.audia_groq_key || safeJoin(["gsk", "_", "LTqAQ", "lrMXEw", "2cIHV", "Z5FN", "WGdyb", "3FYC", "OdPxLL", "Dy2kf", "V543", "y78ls", "RJv"]), 
         murf: data.audia_murf_key || safeJoin(["ap2", "_", "99d15b71", "-", "0842", "-", "4478", "-", "8786", "-", "53d6e621875e"]) 
       });
     });
